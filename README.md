@@ -131,4 +131,11 @@ tio -b 74880 /dev/ttyUSB0
 The baudrate can be setup and found in `sdkconfig`.
 
 
+# Debugging
+| jtag | esp8266 |
+|------|---------|
+| TDO  | GPIO 15 |
+| TDI  | GPIO 12 |
+| TCK  | GPIO 13 |
+| TMS  | GPIO 14 |
 
