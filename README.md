@@ -24,13 +24,12 @@ The ESP8266 is a low-cost Wi-Fi microchip, with built-in TCP/IP networking softw
 # Hardware prerequiest
 - ESP8266 devboard
   + I use D1 mini in this tutorial
-- Any JTAG debugger
 
 # Toolchain overview
 - Compiler: Xtensa L106 GNU Toolchain
 - SDK: ESP8266_RTOS_SDK / ESP8266_NONOS_SDK (**deprecated**)
 - Programming Tool: esptool integrated in SDK
-- Debugging: esp8266-openocd / gdb
+- Debugging: UART log
 
 # Compiler
 
@@ -132,10 +131,10 @@ The baudrate can be setup and found in `sdkconfig`.
 
 
 # Debugging
-| jtag | esp8266 |
-|------|---------|
-| TDO  | GPIO 15 |
-| TDI  | GPIO 12 |
-| TCK  | GPIO 13 |
-| TMS  | GPIO 14 |
+
+There is no JTAG debugging support for ESP8266, although there is [some work to openocd](https://www.esp8266.com/viewtopic.php?f=9&t=1871) already done, but as I verified, they all don't work.
+
+You have to use UART log to debug ESP8266 as mentioned above, such as `make monitor` or `tio -b 74880 /dev/ttyUSB0`.
+
+
 
