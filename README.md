@@ -276,7 +276,7 @@ And reset the target device, the output should look like:
 no GPIO select!
 jump to run user2 @ 81000
 ```
-The line `jump to run user2 @ 81000` tell us user2 firmware should be built and program to 0x81000. The start addr depends on flash size, be careful to provide correct args of `esptool.py`.
+The line `jump to run user2 @ 81000` tell us user2 firmware should be built and program to 0x81000. The start addr depends on flash size, so you need to be very careful to provide correct args for `esptool.py` to get the correct information.
 
 ### why program `esp_init_data_default_v08.bin` to `0x3fc000` ?
 
