@@ -114,7 +114,7 @@ cp -r blink-nonos ~/esp/ESP8266_NONOS_SDK
 cd ~/esp/ESP8266_NONOS_SDK/blink-nonos
 ./gen_misc.sh
 ```
-There are some questions you need answer, I used D1 mini with 4M Flash:
+There are some questions you need answer, here I used D1 mini with 4M Flash:
 ```
 gen_misc.sh version 20150511
 
@@ -158,14 +158,15 @@ spi ota map:  512KB + 512KB
 start...
 ```
 
-It will start build automatically, and have some outputs like this:
+And it will start build automatically, the output looks like:
 ```
 Support boot_v1.2 and +
 Generate user2.4096.new.4.bin successully in folder bin/upgrade.
 boot.bin------------>0x00000
 user2.4096.new.4.bin--->0x81000
-
 ```
+
+You may be confused which one is the correct answer should I choose when running `gen_misc.sh`, I will answer this question in below section.
 
 # Programming
 
@@ -221,21 +222,69 @@ The baudrate can be setup and found in `sdkconfig`.
 
 After build successfully, enter `~/esp/ESP8266_NONOS_SDK/bin` dir.
 
+You will find these files:
+- boot_v1.2.bin / boot_v1.6.bin / boot_v1.7.bin, boot firmware provided by SDK.
+- esp_init_data_default_v05.bin / esp_init_data_default_v08.bin, the default init data provided by SDK.
+- upgrade/user2.4096.new.4.bin, user firmware.
+
 For first time programming:
 ```
 esptool.py --port /dev/ttyUSB0 -b 115200 erase_flash
-esptool.py --port /dev/ttyUSB0 -b 115200  write_flash -fm dio --flash_freq 80m --flash_size 4MB 0 boot_v1.7.bin
+esptool.py --port /dev/ttyUSB0 -b 115200 write_flash -fm dio --flash_freq 80m --flash_size 4MB 0 boot_v1.7.bin
+esptool.py --port /dev/ttyUSB0 -b 115200 write_flash -fm dio --flash_freq 80m --flash_size 4MB 0x81000 upgrade/user2.4096.new.4.bin
+esptool.py --port /dev/ttyUSB0 -b 115200 write_flash -fm dio --flash_freq 80m --flash_size 4MB 0x3fc000 esp_init_data_default_v08.bin
+```
+
+If you already have these firmware programmed, you can only update the user firmware as:
+```
 esptool.py --port /dev/ttyUSB0 -b 115200  write_flash -fm dio --flash_freq 80m --flash_size 4MB 0x81000 upgrade/user2.4096.new.4.bin
-esptool.py --port /dev/ttyUSB0 -b 115200  write_flash -fm dio --flash_freq 80m --flash_size 4MB 0x3fc000 esp_init_data_default_v08.bin
 ```
 
-If you already have these firmware programmed and only update the application firmware:
+**NOTE**, the `-fm dio --flash_freq 80m --flash_size 4MB` should match exactly what you input when running `gen_misc.sh` to build the project.
+
+And let's explain some inputs to `gen_misc.sh` when building this project:
+
+- why build user2 firmware ?
+
 ```
-esptool.py --port /dev/ttyUSB0 -b 115200  write_flash -fm dio --flash_freq 80m --flash_size 4MB 0x81000 upgrade/user2.4096.new.4.bin
+./gen_misc.sh
+...
+STEP 2: choose bin generate(0=eagle.flash.bin+eagle.irom0text.bin, 1=user1.bin, 2=user2.bin)
+enter (0/1/2, default 0):
+2
+generate bin: user2.bin
+```
+The reason choose `2` here is required by `boot_v1.7.bin`, you can program `boot_v1.7.bin` to target device as:
+
+```
+esptool.py --port /dev/ttyUSB0 -b 115200 erase_flash
+esptool.py --port /dev/ttyUSB0 -b 115200 write_flash -fm dio --flash_freq 80m --flash_size 4MB 0 boot_v1.7.bin
 ```
 
-NOTE, the `-fm dio --flash_freq 80m --flash_size 4MB` should match what you input when running `gen_misc.sh`.
+Then use tio to open the serial port:
 
+```
+tio -b 74880 /dev/ttyUSB0
+```
+
+And reset the target device, the output should look like:
+```
+2nd boot version : 1.7
+  SPI Speed      : 80MHz
+  SPI Mode       : DIO
+  SPI Flash Size & Map: 32Mbit(512KB+512KB)
+no GPIO select!
+jump to run user2 @ 81000
+```
+The line `jump to run user2 @ 81000` tell us user2 firmware should be built and program to 0x81000. The start addr depends on flash size, be careful to provide correct args of `esptool.py`.
+
+- why program `esp_init_data_default_v08.bin` to `0x3fc000`
+It is defined by partition table introduced from non-os sdk v3.0, refer to `blink-nonos/user/partitions.c` for more information, usually:
+
+- 0x7c000 for 512K flash
+- 0xfc000 for 1M flash
+- 0x1fc000 for 2M flash
+- 0x3fc000 for 4M flash
 
 # Debugging
 
