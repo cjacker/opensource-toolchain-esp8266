@@ -168,6 +168,11 @@ user2.4096.new.4.bin--->0x81000
 
 You may be confused which one should choose when running `gen_misc.sh`, I will explain it next section.
 
+**NOTE :** Partition table 
+
+Partition table was introduced from NonOS SDK v3.0, you have to add user_pre_init() in your project, which will be called before user_init(). And you MUST call system_partition_table_regist() in user_pre_init to register your project partition table. Otherwise you may encounter rebooting loop issue with serial output `rf_cal[0] !=0x05,is 0xFF`.
+
+
 # Programming
 
 Connect the USB typec or micro port of ESP8266 devboard to USB PC port, usually there is a UART chip integrated on board and you should find `/dev/ttyACM0` or `/dev/ttyUSB0` created after devboard plugged in.
@@ -292,6 +297,3 @@ It is defined by partition table introduced from NONOS SDK v3.0, refer to `blink
 There is no JTAG debugging support for ESP8266, although there is [some work to openocd](https://www.esp8266.com/viewtopic.php?f=9&t=1871) already done, but as I verified, they all don't work.
 
 You have to use UART log to debug ESP8266 as mentioned above, such as `make monitor` or `tio -b 74880 /dev/ttyUSB0`.
-
-
-
