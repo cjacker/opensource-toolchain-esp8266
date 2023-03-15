@@ -1,5 +1,7 @@
 # Opensource toolchain tutorial for Espressif ESP8266
 
+For ESP32 series, please refer to https://github.com/cjacker/opensource-toolchain-esp8266, and ESP32-C2/C3 is recommended to use instead to replace ESP8266.
+
 The ESP8266 is a low-cost Wi-Fi microchip, with built-in TCP/IP networking software, and microcontroller capability, produced by Espressif Systems in Shanghai, China. The chip was popularized in the English-speaking maker community in August 2014 via the ESP-01 module, made by a third-party manufacturer Ai-Thinker. This small module allows microcontrollers to connect to a Wi-Fi network and make simple TCP/IP connections using Hayes-style commands. 
 
 **Features**
