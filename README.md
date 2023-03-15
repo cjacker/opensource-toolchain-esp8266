@@ -285,7 +285,7 @@ The line `jump to run user2 @ 81000` tell us user2 firmware should be built and 
 
 ### why program `esp_init_data_default_v08.bin` to `0x3fc000` ?
 
-It is defined by partition table introduced from NONOS SDK v3.0, refer to `blink-nonos/user/partitions.c` for more information, usually:
+It is defined by partition table introduced from NONOS SDK v3.0, refer to [blink-nonos/user/partitions.c](./blink-nonos/user/partitions.c) for more information, usually:
 
 - 0x7c000 for 512K flash
 - 0xfc000 for 1M flash
