@@ -110,6 +110,10 @@ cp -r blink-nonos ~/esp/ESP8266_NONOS_SDK
 
 ### Build blink-nonos demo
 
+#### with gen_misc.sh
+
+You can use `gen_misc.sh` to build nonos project as:
+
 ```
 cd ~/esp/ESP8266_NONOS_SDK/blink-nonos
 ./gen_misc.sh
@@ -166,7 +170,13 @@ boot.bin------------>0x00000
 user2.4096.new.4.bin--->0x81000
 ```
 
-You may be confused which one should choose when running `gen_misc.sh`, I will explain it next section.
+#### with make
+
+```
+make COMPILE=gcc BOOT=new APP=2 SPI_SPEED=80 SPI_MODE=DIO SPI_SIZE_MAP=4
+```
+
+You may be confused which one should choose when running `gen_misc.sh` and which option should used with `make`, I will explain it next section.
 
 **NOTE :** Partition table 
 
@@ -259,6 +269,7 @@ enter (0/1/2, default 0):
 2
 generate bin: user2.bin
 ```
+
 The reason choose `2` here is required by `boot_v1.7.bin`, you can program `boot_v1.7.bin` to target device as:
 
 ```
