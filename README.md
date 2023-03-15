@@ -166,7 +166,7 @@ boot.bin------------>0x00000
 user2.4096.new.4.bin--->0x81000
 ```
 
-You may be confused which one is the correct answer should I choose when running `gen_misc.sh`, I will answer this question in below section.
+You may be confused which one should choose when running `gen_misc.sh`, I will explain it next section.
 
 # Programming
 
@@ -244,7 +244,7 @@ esptool.py --port /dev/ttyUSB0 -b 115200  write_flash -fm dio --flash_freq 80m -
 
 And let's explain some inputs to `gen_misc.sh` when building this project:
 
-- why build user2 firmware ?
+### why build user2 firmware ?
 
 ```
 ./gen_misc.sh
@@ -278,8 +278,9 @@ jump to run user2 @ 81000
 ```
 The line `jump to run user2 @ 81000` tell us user2 firmware should be built and program to 0x81000. The start addr depends on flash size, be careful to provide correct args of `esptool.py`.
 
-- why program `esp_init_data_default_v08.bin` to `0x3fc000`
-It is defined by partition table introduced from non-os sdk v3.0, refer to `blink-nonos/user/partitions.c` for more information, usually:
+### why program `esp_init_data_default_v08.bin` to `0x3fc000` ?
+
+It is defined by partition table introduced from NONOS SDK v3.0, refer to `blink-nonos/user/partitions.c` for more information, usually:
 
 - 0x7c000 for 512K flash
 - 0xfc000 for 1M flash
