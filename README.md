@@ -23,7 +23,7 @@ The ESP8266 is a low-cost Wi-Fi microchip, with built-in TCP/IP networking softw
 
 # Hardware prerequiest
 - ESP8266 devboard
-  + I use D1 mini in this tutorial
+  + I use D1 mini (4M Flash) and An-Thinker ESP-1S in this tutorial
 
 # Toolchain overview
 - Compiler: Xtensa L106 GNU Toolchain
@@ -48,9 +48,11 @@ Do not forget to add `/opt/xtensa-lx106-elf/bin` to PATH env of your shell.
 
 
 # SDK
+## ESP8266_RTOS_SDK
+
 Espressif released two versions of the SDK — one is [ESP8266_RTOS_SDK](https://github.com/espressif/ESP8266_RTOS_SDK) based FreeRTOS and the other is ESP8266_NONOS_SDK which already deprecated. This tutorial will focus on [ESP8266_RTOS_SDK](https://github.com/espressif/ESP8266_RTOS_SDK), since it is supported and still maintained by upstream.
 
-## setup the SDK
+### setup the SDK
 
 I put the sdk in `~/esp` dir.
 ```
@@ -60,7 +62,7 @@ cd ESP8266_RTOS_SDK
 git submodule update --init --recursive --progress
 ```
 
-A env var need exported to find the SDK:
+An env var need exported to find the SDK:
 ```
 export IDF_PATH=$HOME/esp/ESP8266_RTOS_SDK
 ```
@@ -69,7 +71,7 @@ And you also need install some python modules the SDK required:
 python -m pip install --user -r $IDF_PATH/requirements.txt
 ```
 
-## build hello_world demo
+### build hello_world demo
 There is some examples provided by ESP8266_RTOS_SDK, you can build the hello_world example as:
 ```
 cd ~/esp/ESP8266_RTOS_SDK/examples/get-started/hello_world
@@ -80,10 +82,96 @@ When build hello_world first time, it will invoke `make menuconfig` to generate 
 
 After build successfully, the 'hello_world.bin/elf` will be generated at `build` dir.
 
+
+## ESP8266_NONOS_SDK
+
+Non-OS SDK is not based on an operating system. And deprecated from December 2019, but there are still a lot of users stay with Non-OS SDK
+
+### Setup the SDK
+
+I put the sdk in `~/esp` dir.
+```
+mkdir -p ~/esp && cd ~/esp
+git clone https://github.com/espressif/ESP8266_NONOS_SDK.git
+cd ESP8266_NONOS_SDK
+git submodule update --init --recursive --progress
+```
+
+And since all python script in Non-OS SDK is python2, you should fix the python version issue as:
+```
+sed -i "s/@python /@python2 /g" ~/esp/ESP8266_NONOS_SDK/Makefile
+```
+
+
+Not like ESP8266_RTOS_SDK, it doesn't support 'out-of-sdk' projects, you have to put your project at SDK dir, for example, use `blink-nonos` demo in this repo as example, you should put it to `~/esp/ESP8266_NONOS_SDK` dir.
+```
+cp -r blink-nonos ~/esp/ESP8266_NONOS_SDK
+```
+
+### Build blink-nonos demo
+
+```
+cd ~/esp/ESP8266_NONOS_SDK/blink-nonos
+./gen_misc.sh
+```
+There are some questions you need answer, I used D1 mini with 4M Flash:
+```
+gen_misc.sh version 20150511
+
+Please follow below steps(1-5) to generate specific bin(s):
+STEP 1: choose boot version(0=boot_v1.1, 1=boot_v1.2+, 2=none)
+enter(0/1/2, default 2):
+1
+boot mode: new
+
+STEP 2: choose bin generate(0=eagle.flash.bin+eagle.irom0text.bin, 1=user1.bin, 2=user2.bin)
+enter (0/1/2, default 0):
+2
+generate bin: user2.bin
+
+STEP 3: choose spi speed(0=20MHz, 1=26.7MHz, 2=40MHz, 3=80MHz)
+enter (0/1/2/3, default 2):
+3
+spi speed: 80 MHz
+
+STEP 4: choose spi mode(0=QIO, 1=QOUT, 2=DIO, 3=DOUT)
+enter (0/1/2/3, default 0):
+2
+spi mode: DIO
+
+STEP 5: choose spi size and map
+    0= 512KB( 256KB+ 256KB)
+    2=1024KB( 512KB+ 512KB)
+    3=2048KB( 512KB+ 512KB)
+    4=4096KB( 512KB+ 512KB)
+    5=2048KB(1024KB+1024KB)
+    6=4096KB(1024KB+1024KB)
+    7=4096KB(2048KB+2048KB) not support ,just for compatible with nodeMCU board
+    8=8192KB(1024KB+1024KB)
+    9=16384KB(1024KB+1024KB)
+enter (0/2/3/4/5/6/7/8/9, default 0):
+4
+spi size: 4096KB
+spi ota map:  512KB + 512KB
+
+
+start...
+```
+
+It will start build automatically, and have some outputs like this:
+```
+Support boot_v1.2 and +
+Generate user2.4096.new.4.bin successully in folder bin/upgrade.
+boot.bin------------>0x00000
+user2.4096.new.4.bin--->0x81000
+
+```
+
 # Programming
 
 Connect the USB typec or micro port of ESP8266 devboard to USB PC port, usually there is a UART chip integrated on board and you should find `/dev/ttyACM0` or `/dev/ttyUSB0` created after devboard plugged in.
 
+## ESP8266_RTOS_SDK
 Then you can program the target device as:
 ```
 make flash
@@ -128,6 +216,25 @@ tio -b 74880 /dev/ttyUSB0
 ```
 
 The baudrate can be setup and found in `sdkconfig`.
+
+## ESP8266_NONOS_SDK
+
+After build successfully, enter `~/esp/ESP8266_NONOS_SDK/bin` dir.
+
+For first time programming:
+```
+esptool.py --port /dev/ttyUSB0 -b 115200 erase_flash
+esptool.py --port /dev/ttyUSB0 -b 115200  write_flash -fm dio --flash_freq 80m --flash_size 4MB 0 boot_v1.7.bin
+esptool.py --port /dev/ttyUSB0 -b 115200  write_flash -fm dio --flash_freq 80m --flash_size 4MB 0x81000 upgrade/user2.4096.new.4.bin
+esptool.py --port /dev/ttyUSB0 -b 115200  write_flash -fm dio --flash_freq 80m --flash_size 4MB 0x3fc000 esp_init_data_default_v08.bin
+```
+
+If you already have these firmware programmed and only update the application firmware:
+```
+esptool.py --port /dev/ttyUSB0 -b 115200  write_flash -fm dio --flash_freq 80m --flash_size 4MB 0x81000 upgrade/user2.4096.new.4.bin
+```
+
+NOTE, the `-fm dio --flash_freq 80m --flash_size 4MB` should match what you input when running `gen_misc.sh`.
 
 
 # Debugging
