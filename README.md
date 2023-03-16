@@ -393,6 +393,9 @@ OK
 
 Here I already updated to latest v1.7.5 version. if not, you can build and update the firmware by your self.
 
+Because AT commands must be terminated with both the CR and LF ASCII control codes, I use `-m ONLCRNL` with tio or `--omap crcrlf` with picocom, otherwise, you have to use `Ctrl-M Ctrl-J` instead of `Enter` key.
+
+
 ### build and flash at_nano firmware
 
 For ESP-1S, since it has 1M flash, it can only use `at_nano` firmware which supports an SSL library with fewer ciphers but fits on 1 MB of flash memory.
