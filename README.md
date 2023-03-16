@@ -34,6 +34,8 @@ The ESP8266 is a low-cost Wi-Fi microchip, with built-in TCP/IP networking softw
   + [ESP8266_RTOS_SDK](#esp8266_rtos_sdk-1)
   + [ESP8266_NONOS_SDK](#esp8266_nonos_sdk-1)
 - [Debugging](#debugging)
+- [Classic AT firmware for ESP-1S](#classic-at-firmware-for-esp8266)
+- [AT-MQTT firmware for ESP-1S](#at-mqtt-firmware-for-esp-1s)
 
 # Hardware prerequiest
 - ESP8266 devboard
