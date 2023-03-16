@@ -148,7 +148,7 @@ boot mode: new
 
 STEP 2: choose bin generate(0=eagle.flash.bin+eagle.irom0text.bin, 1=user1.bin, 2=user2.bin)
 enter (0/1/2, default 0):
-2
+1
 generate bin: user2.bin
 
 STEP 3: choose spi speed(0=20MHz, 1=26.7MHz, 2=40MHz, 3=80MHz)
@@ -185,26 +185,26 @@ And it will start build automatically, the output looks like:
 Support boot_v1.2 and +
 Generate user2.4096.new.4.bin successully in folder bin/upgrade.
 boot.bin------------>0x00000
-user2.4096.new.4.bin--->0x81000
+user1.4096.new.4.bin--->0x1000
 ```
 
-You can also choose `1` when 
+You can also choose `2` when 
 ```
 STEP 2: choose bin generate(0=eagle.flash.bin+eagle.irom0text.bin, 1=user1.bin, 2=user2.bin)
 ```
+And the final user firmware will be `user2.4096.new.4.bin` and should program to `0x81000`.
 
-And the final user firmware will be `user1.4096.new.4.bin` and should program to `0x1000`.
+The `user1.bin` and `user2.bin` is something related to FOTA (firmware over the air), it is a update mechanism, you can treat it as AB system for now, if A running, then update B and switch to B. For this simple blink demo, use `user1.bin` or `user2.bin` or both as you like.
 
 #### with make
 
 ```
-make COMPILE=gcc BOOT=new APP=2 SPI_SPEED=80 SPI_MODE=DIO SPI_SIZE_MAP=4
-```
-Or use `APP=1` to generate `user1.4096.new.4.bin` :
-```
 make COMPILE=gcc BOOT=new APP=1 SPI_SPEED=80 SPI_MODE=DIO SPI_SIZE_MAP=4
 ```
-
+Or use `APP=2` 
+```
+make COMPILE=gcc BOOT=new APP=2 SPI_SPEED=80 SPI_MODE=DIO SPI_SIZE_MAP=4
+```
 You may be confused which one should choose when running `gen_misc.sh` and which option should used with `make`, I will explain it next section.
 
 **NOTE :** Partition table 
@@ -264,24 +264,21 @@ The baudrate can be setup and found in `sdkconfig`.
 
 ## ESP8266_NONOS_SDK
 
-After build successfully, enter `~/esp/ESP8266_NONOS_SDK/bin` dir.
+After blink-nonos demo built successfully, enter `~/esp/ESP8266_NONOS_SDK/bin` dir.
 
 You will find these files:
 - boot_v1.2.bin / boot_v1.6.bin / boot_v1.7.bin, boot firmware provided by SDK.
 - esp_init_data_default_v05.bin / esp_init_data_default_v08.bin, the default init data provided by SDK.
-- upgrade/user2.4096.new.4.bin, user firmware.
+- upgrade/user1.4096.new.4.bin, user1 firmware.
+- upgrade/user2.4096.new.4.bin, user2 firmware if you built it again with `APP=2`.
 
 For first time programming:
 ```
 esptool.py --port /dev/ttyUSB0 -b 115200 erase_flash
 esptool.py --port /dev/ttyUSB0 -b 115200 write_flash -fm dio --flash_freq 80m --flash_size 4MB 0 boot_v1.7.bin
+esptool.py --port /dev/ttyUSB0 -b 115200 write_flash -fm dio --flash_freq 80m --flash_size 4MB 0x1000 upgrade/user1.4096.new.4.bin
 esptool.py --port /dev/ttyUSB0 -b 115200 write_flash -fm dio --flash_freq 80m --flash_size 4MB 0x81000 upgrade/user2.4096.new.4.bin
 esptool.py --port /dev/ttyUSB0 -b 115200 write_flash -fm dio --flash_freq 80m --flash_size 4MB 0x3fc000 esp_init_data_default_v08.bin
-```
-
-If you choose `APP=1` when build, you should program the `user1.4096.new.4.bin` to `0x1000` as:
-```
-esptool.py --port /dev/ttyUSB0 -b 115200 write_flash -fm dio --flash_freq 80m --flash_size 4MB 0x1000 upgrade/user1.4096.new.4.bin
 ```
 
 You can also combine these together:
@@ -289,11 +286,17 @@ You can also combine these together:
 esptool.py --port /dev/ttyUSB0 -b 115200 write_flash \
 -e -fm dio --flash_freq 80m --flash_size 4MB \
 0x00000 boot_v1.7.bin \
+0x1000 upgrade/user1.4096.new.4.bin \
 0x81000 upgrade/user2.4096.new.4.bin \
 0x3fc000 esp_init_data_default_v08.bin
 ```
 
 If you already have these firmware programmed, you can only update the user firmware as:
+
+```
+esptool.py --port /dev/ttyUSB0 -b 115200  write_flash -fm dio --flash_freq 80m --flash_size 4MB 0x1000 upgrade/user1.4096.new.4.bin
+```
+Or
 ```
 esptool.py --port /dev/ttyUSB0 -b 115200  write_flash -fm dio --flash_freq 80m --flash_size 4MB 0x81000 upgrade/user2.4096.new.4.bin
 ```
@@ -304,18 +307,9 @@ And let's explain some inputs to `gen_misc.sh` when building this project:
 
 ### why program user2 firmware to 0x81000 ?
 
-```
-./gen_misc.sh
-...
-STEP 2: choose bin generate(0=eagle.flash.bin+eagle.irom0text.bin, 1=user1.bin, 2=user2.bin)
-enter (0/1/2, default 0):
-2
-generate bin: user2.bin
-```
+We know user1 should always program to `0x1000`. why program user2 firmware to 0x81000 ?
 
-If you choose `1` here, no matter the flash size, the firmware `user1.***.bin` should program to `0x1000`.
-
-If you choose `2` here, the target address depend on flash size, you can program `boot_v1.7.bin` to target device as:
+Actually, the target address depend on flash size, you can program `boot_v1.7.bin` to target device as:
 
 ```
 esptool.py --port /dev/ttyUSB0 -b 115200 erase_flash
@@ -328,7 +322,7 @@ Then use tio to open the serial port:
 tio -b 74880 /dev/ttyUSB0
 ```
 
-And reset the target device, the output should look like:
+Then reset the target device, the output should look like:
 ```
 2nd boot version : 1.7
   SPI Speed      : 80MHz
@@ -337,7 +331,7 @@ And reset the target device, the output should look like:
 no GPIO select!
 jump to run user2 @ 81000
 ```
-The line `jump to run user2 @ 81000` tell us user2 firmware should be built and program to 0x81000. The start addr of user2 depends on flash size, so you need to be very careful to provide correct args for `esptool.py` to get the correct information.
+The line `jump to run user2 @ 81000` tell us user2 firmware should program to 0x81000. Since the start addr of user2 depends on flash size, so you need to be very careful to provide correct args for `esptool.py` when programming.
 
 ### why program `esp_init_data_default_v08.bin` to `0x3fc000` ?
 
