@@ -346,3 +346,24 @@ It is defined by partition table introduced from NONOS SDK v3.0, refer to [blink
 There is no JTAG debugging support for ESP8266, although there is [some work to openocd](https://www.esp8266.com/viewtopic.php?f=9&t=1871) already done, but as I verified, they all don't work.
 
 You have to use UART log to debug ESP8266 as mentioned above, such as `make monitor` or `tio -b 74880 /dev/ttyUSB0`.
+
+
+# Build classic AT firmware for ESP8266
+
+Build AT firmware for D1 mini with 4M flash
+```
+make COMPILE=gcc BOOT=new APP=1 SPI_SPEED=80 SPI_MODE=DIO SPI_SIZE_MAP=6
+!!!
+-1815528369
+1815528368
+Support boot_v1.4 and +
+Generate user1.4096.new.6.bin successully in folder bin/upgrade.
+boot.bin------------>0x00000
+user1.4096.new.6.bin--->0x01000
+!!!
+esptool.py --port /dev/ttyUSB0 -b 115200 erase_flash
+esptool.py --port /dev/ttyUSB0 -b 115200 write_flash -fm dio --flash_freq 80m --flash_size 4MB 0 boot_v1.7.bin
+esptool.py --port /dev/ttyUSB0 -b 115200 write_flash -fm dio --flash_freq 80m --flash_size 4MB 0x1000 upgrade/user1.4096.new.6.bin
+esptool.py --port /dev/ttyUSB0 -b 115200 write_flash -fm dio --flash_freq 80m --flash_size 4MB 0x3fc000 esp_init_data_default_v08.bin
+tio -b 115200 /dev/ttyUSB0 -m ONLCRNL
+```
