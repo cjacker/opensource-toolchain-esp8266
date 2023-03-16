@@ -352,7 +352,7 @@ You have to use UART log to debug ESP8266 as mentioned above, such as `make moni
 
 The latest classic AT firmware is **v1.7.5** provided by ESP8266_NONOS_SDK. Since The most common devices that use ESP8266 is ESP-1S module, I will introduce how to build and flash at firmware of ESP-1S in the first section.
 
-For usage of classic AT firmware, please refer to official document [ESP8266 AT Instruction Set](https://www.espressif.com/sites/default/files/4a-esp8266_at_instruction_set_en_v1.5.4_0.pdf).
+For usage of classic AT firmware, please refer to official document [ESP8266 Non-OS AT Instruction Set](https://www.espressif.com/sites/default/files/documentation/4a-esp8266_at_instruction_set_en.pdf).
 
 ## ESP-1S
 
@@ -495,4 +495,9 @@ SDK version:3.0.5(b29dcd3)
 compile time:Mar 16 2023 13:14:07
 OK
 ```
+
+
+# Build esp-at firmware for ESP8266
+[ESP-AT](https://github.com/espressif/esp-at) firmware for ESP8266 is newer than classic AT firmware, sometimes it also refer to `AT-MQTT` firmware. it is based on ESP8266_RTOS_SDK and the latest version is v2.2.1.0.
+
 
