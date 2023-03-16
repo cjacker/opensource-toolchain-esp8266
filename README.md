@@ -350,15 +350,17 @@ You have to use UART log to debug ESP8266 as mentioned above, such as `make moni
 
 # Build classic AT firmware for ESP8266
 
-The latest classic AT firmware is v1.7.5 provided by ESP8266_NONOS_SDK. Since The most common devices that use ESP8266 is ESP-1 / ESP-1S module, I will introduce how to build and flash at firmware of ESP-1 / ESP-1S in the first section.
+The latest classic AT firmware is **v1.7.5** provided by ESP8266_NONOS_SDK. Since The most common devices that use ESP8266 is ESP-1S module, I will introduce how to build and flash at firmware of ESP-1S in the first section.
 
-## ESP-1 / ESP-1S
+For usage of AT firmware, please refer to official document [ESP8266 AT Instruction Set](https://www.espressif.com/sites/default/files/4a-esp8266_at_instruction_set_en_v1.5.4_0.pdf).
 
-There are various difference between ESP-1 and ESP-1S, the most important difference for us to build the firmware is ESP-1 has 512k flash and ESP-1S has 1MB flash. 
+## ESP-1S
+
+Since I don't have ESP-1 module, I will use ESP-1S as example, ESP-1S has 1M flash and ESP-1 has only 512K flash, it will affect building options, you should change it if you have a ESP-1 module.
 
 ### Check AT firmware version
 
-Since ESP-1/ESP-1S module has no UART chip integrated on baord, you have to use a external USB2TTL adapter and wire it up as:
+Since ESP-1S module has no UART chip integrated on board, you have to use a external USB2TTL adapter and wire it up as:
 
 | USB2TTL | ESP-1S |
 |---------|--------|
@@ -391,24 +393,103 @@ OK
 
 Here I already updated to latest v1.7.5 version. if not, you can build and update the firmware by your self.
 
-### build AT firmware
+### build and flash at_nano firmware
 
-For ESP-1 and ESP-1S, since it has less than 1M flash, it can only support `at_nano` firmware which supports an SSL library with fewer ciphers but fits on  less then 1 MB of flash memory.
+For ESP-1S, since it has 1M flash, it can only use `at_nano` firmware which supports an SSL library with fewer ciphers but fits on 1 MB of flash memory.
 
-To build at_nano
+You can use some ESP-1S Dock to flash ESP-1S. if you do not have one, wire it up with a USB2TTL adapter as:
+
+| USB2TTL | ESP-1[S] |
+|---------|----------|
+| 3v3     | 3v3      |
+| 3v3     | RST      |
+| 3v3     | EN       |
+| 3v3     | GPIO2    |
+| GND     | GND      |
+| GND     | GPIO0    |
+| RX      | TX       |
+| TX      | RX       |
+
+Note again, **DO NOT use 5V power supply, ESP-1S is 3V3 tolerance.**
+
+#### To build at_nano firmware for ESP-1S
 ```
+cd ESP8266_NONOS_SDK
+cp -r examples/at_nano . && cd at_nano
+make COMPILE=gcc BOOT=new APP=1 SPI_SPEED=80 SPI_MODE=DIO SPI_SIZE_MAP=2
+```
+
+The output looks like:
+```
+Support boot_v1.2 and +
+Generate user1.1024.new.2.bin successully in folder bin/upgrade.
+boot.bin------------>0x00000
+user1.1024.new.2.bin--->0x01000
+```
+
+#### to flash to ESP-1S
+After `user1.1024.new.2.bin` generated, program it to ESP-1S as:
+```
+cd <where you put>/ESP8266_NONOS_SDK/bin
+esptool.py --port /dev/ttyUSB0 -b 115200 write_flash \
+    -e \
+    -fm dio --flash_freq 80m --flash_size 1MB \
+    0x00000 boot_v1.7.bin \
+    0x01000 upgrade/user1.1024.new.2.bin \
+    0xfc000 esp_init_data_default_v08.bin
+```
+
+Actually, it can be used to program to 2M or 4M flash size too.
+
+After firemware programmed, please refer to above "Check AT firmware version" section to verify it.
+
+## Other 8266 devboard
+
+It's simpler to program at firmware for various ESP8266 devboards. Most of them have a UART chip integrated, it's not necessary to care about how to wire up, and most of them has 2M or 4M flash, `at` firmware can be used instead of `at_nano`.
+
+### build at firmware
+Use d1 mini with 4M flash as example.
+
+```
+cd ESP8266_NONOS_SDK
+cp -r examples/at . && cd at
 make COMPILE=gcc BOOT=new APP=1 SPI_SPEED=80 SPI_MODE=DIO SPI_SIZE_MAP=6
-!!!
--1815528369
-1815528368
+```
+
+The output looks like:
+```
 Support boot_v1.4 and +
 Generate user1.4096.new.6.bin successully in folder bin/upgrade.
 boot.bin------------>0x00000
 user1.4096.new.6.bin--->0x01000
-!!!
-esptool.py --port /dev/ttyUSB0 -b 115200 erase_flash
-esptool.py --port /dev/ttyUSB0 -b 115200 write_flash -fm dio --flash_freq 80m --flash_size 4MB 0 boot_v1.7.bin
-esptool.py --port /dev/ttyUSB0 -b 115200 write_flash -fm dio --flash_freq 80m --flash_size 4MB 0x1000 upgrade/user1.4096.new.6.bin
-esptool.py --port /dev/ttyUSB0 -b 115200 write_flash -fm dio --flash_freq 80m --flash_size 4MB 0x3fc000 esp_init_data_default_v08.bin
-tio -b 115200 /dev/ttyUSB0 -m ONLCRNL
 ```
+
+#### to flash to D1 mini
+After `user1.4096.new.6.bin` generated, program it to ESP-1S as:
+```
+cd <where you put>/ESP8266_NONOS_SDK/bin
+esptool.py --port /dev/ttyUSB0 -b 115200 write_flash \
+    -e \
+    -fm dio --flash_freq 80m --flash_size 4MB \
+    0x0000 boot_v1.7.bin \
+    0x1000 upgrade/user1.4096.new.6.bin \
+    0x3fc000 esp_init_data_default_v08.bin \
+```
+
+After programming finished, you can verify it by `tio -b 115200 /dev/ttyUSB0 -m ONLCRNL`:
+```
+$ tio -b 115200 /dev/ttyUSB0 -m ONLCRNL
+[14:59:57.369] tio v2.5
+[14:59:57.369] Press ctrl-t q to quit
+[14:59:57.370] Connected
+AT
+
+OK
+
+AT+GMR
+AT version:1.7.5.0(Oct  9 2021 09:26:04)
+SDK version:3.0.5(b29dcd3)
+compile time:Mar 16 2023 13:14:07
+OK
+```
+
