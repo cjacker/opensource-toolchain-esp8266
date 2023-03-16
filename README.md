@@ -443,7 +443,7 @@ Actually, it can be used to program to 2M or 4M flash size too.
 
 After firemware programmed, please refer to above "Check AT firmware version" section to verify it.
 
-## Other 8266 devboard
+## Other 8266 devboards
 
 It's simpler to program at firmware for various ESP8266 devboards. Most of them have a UART chip integrated, it's not necessary to care about how to wire up, and most of them has 2M or 4M flash, `at` firmware can be used instead of `at_nano`.
 
