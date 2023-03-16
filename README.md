@@ -23,6 +23,18 @@ The ESP8266 is a low-cost Wi-Fi microchip, with built-in TCP/IP networking softw
 - UART on dedicated pins, plus a transmit-only UART can be enabled on GPIO2
 - 10-bit ADC (successive approximation ADC)
 
+# Table of contents
+- [Hardware prerequiest](#hardware-prerequiest)
+- [Toolchain overview](#toolchain-overview)
+- [Compiler](#compiler)
+- [SDK](#sdk)
+  + [ESP8266_RTOS_SDK](#esp8266_rtos_sdk)
+  + [ESP8266_NONOS_SDK](#esp8266_nonos_sdk)
+- [Programming](#programming)
+  + [ESP8266_RTOS_SDK](#esp8266_rtos_sdk-1)
+  + [ESP8266_NONOS_SDK](#esp8266_nonos_sdk-1)
+- [Debugging](#debugging)
+
 # Hardware prerequiest
 - ESP8266 devboard
   + I use D1 mini (4M Flash) and An-Thinker ESP-1S in this tutorial
@@ -63,6 +75,7 @@ git clone https://github.com/espressif/ESP8266_RTOS_SDK.git
 cd ESP8266_RTOS_SDK
 git submodule update --init --recursive --progress
 ```
+You can also use the release version as you like, as this tutorial written, the latest stable release is v3.4.
 
 An env var need exported to find the SDK:
 ```
@@ -99,11 +112,12 @@ cd ESP8266_NONOS_SDK
 git submodule update --init --recursive --progress
 ```
 
+You can also use the release version as you like, as this tutorial written, the latest stable release is v3.0.5
+
 And since all python script in Non-OS SDK is python2, you should fix the python version issue as:
 ```
 sed -i "s/@python /@python2 /g" ~/esp/ESP8266_NONOS_SDK/Makefile
 ```
-
 
 Not like ESP8266_RTOS_SDK, it doesn't support 'out-of-sdk' projects, you have to put your project at SDK dir, for example, use `blink-nonos` demo in this repo as example, you should put it to `~/esp/ESP8266_NONOS_SDK` dir.
 ```
@@ -172,10 +186,21 @@ boot.bin------------>0x00000
 user2.4096.new.4.bin--->0x81000
 ```
 
+You can also choose `1` when 
+```
+STEP 2: choose bin generate(0=eagle.flash.bin+eagle.irom0text.bin, 1=user1.bin, 2=user2.bin)
+```
+
+And the final user firmware will be `user1.4096.new.4.bin` and it should program to `0x1000`.
+
 #### with make
 
 ```
 make COMPILE=gcc BOOT=new APP=2 SPI_SPEED=80 SPI_MODE=DIO SPI_SIZE_MAP=4
+```
+Or use `APP=1` to generate `user1.4096.new.4.bin` :
+```
+make COMPILE=gcc BOOT=new APP=1 SPI_SPEED=80 SPI_MODE=DIO SPI_SIZE_MAP=4
 ```
 
 You may be confused which one should choose when running `gen_misc.sh` and which option should used with `make`, I will explain it next section.
@@ -266,7 +291,7 @@ If you already have these firmware programmed, you can only update the user firm
 esptool.py --port /dev/ttyUSB0 -b 115200  write_flash -fm dio --flash_freq 80m --flash_size 4MB 0x81000 upgrade/user2.4096.new.4.bin
 ```
 
-**NOTE**, the `-fm dio --flash_freq 80m --flash_size 4MB` should match exactly what you input when running `gen_misc.sh` to build the project.
+**NOTE**, the `-fm dio --flash_freq 80m --flash_size 4MB` should match exactly what you speficied with `make` or what you input when running `gen_misc.sh` to build the project.
 
 And let's explain some inputs to `gen_misc.sh` when building this project:
 
@@ -281,7 +306,9 @@ enter (0/1/2, default 0):
 generate bin: user2.bin
 ```
 
-The reason choose `2` here is required by `boot_v1.7.bin`, you can program `boot_v1.7.bin` to target device as:
+If you choose `1` here, no matter the flash size, the firmware `user1.***.bin` should program to `0x1000`.
+
+If you choose `2` here, the target address depend on flash size, you can program `boot_v1.7.bin` to target device as:
 
 ```
 esptool.py --port /dev/ttyUSB0 -b 115200 erase_flash
@@ -303,7 +330,7 @@ And reset the target device, the output should look like:
 no GPIO select!
 jump to run user2 @ 81000
 ```
-The line `jump to run user2 @ 81000` tell us user2 firmware should be built and program to 0x81000. The start addr depends on flash size, so you need to be very careful to provide correct args for `esptool.py` to get the correct information.
+The line `jump to run user2 @ 81000` tell us user2 firmware should be built and program to 0x81000. The start addr of user2 depends on flash size, so you need to be very careful to provide correct args for `esptool.py` to get the correct information.
 
 ### why program `esp_init_data_default_v08.bin` to `0x3fc000` ?
 
