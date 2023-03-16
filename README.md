@@ -348,7 +348,7 @@ There is no JTAG debugging support for ESP8266, although there is [some work to 
 You have to use UART log to debug ESP8266 as mentioned above, such as `make monitor` or `tio -b 74880 /dev/ttyUSB0`.
 
 
-# Build classic AT firmware for ESP8266
+# Classic AT firmware for ESP8266
 
 The latest classic AT firmware is **v1.7.5** provided by ESP8266_NONOS_SDK. Since The most common devices that use ESP8266 is ESP-1S module, I will introduce how to build and flash at firmware of ESP-1S in the first section.
 
@@ -499,7 +499,7 @@ OK
 ```
 
 
-# Build esp-at firmware for ESP-1S
+# AT-MQTT firmware for ESP-1S
 
 [ESP-AT](https://github.com/espressif/esp-at) firmware for ESP8266 is newer than classic AT firmware, sometimes it also refers to `AT-MQTT` firmware. it is based on ESP8266_RTOS_SDK and the latest version is v2.2.1.0.
 
