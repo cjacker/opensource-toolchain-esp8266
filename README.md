@@ -193,7 +193,7 @@ You can also choose `1` when
 STEP 2: choose bin generate(0=eagle.flash.bin+eagle.irom0text.bin, 1=user1.bin, 2=user2.bin)
 ```
 
-And the final user firmware will be `user1.4096.new.4.bin` and it should program to `0x1000`.
+And the final user firmware will be `user1.4096.new.4.bin` and should program to `0x1000`.
 
 #### with make
 
@@ -279,6 +279,11 @@ esptool.py --port /dev/ttyUSB0 -b 115200 write_flash -fm dio --flash_freq 80m --
 esptool.py --port /dev/ttyUSB0 -b 115200 write_flash -fm dio --flash_freq 80m --flash_size 4MB 0x3fc000 esp_init_data_default_v08.bin
 ```
 
+If you choose `APP=1` when build, you should program the `user1.4096.new.4.bin` to `0x1000` as:
+```
+esptool.py --port /dev/ttyUSB0 -b 115200 write_flash -fm dio --flash_freq 80m --flash_size 4MB 0x1000 upgrade/user1.4096.new.4.bin
+```
+
 You can also combine these together:
 ```
 esptool.py --port /dev/ttyUSB0 -b 115200 write_flash \
@@ -297,7 +302,7 @@ esptool.py --port /dev/ttyUSB0 -b 115200  write_flash -fm dio --flash_freq 80m -
 
 And let's explain some inputs to `gen_misc.sh` when building this project:
 
-### why build user2 firmware ?
+### why program user2 firmware to 0x81000 ?
 
 ```
 ./gen_misc.sh
