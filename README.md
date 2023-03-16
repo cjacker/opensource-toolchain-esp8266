@@ -350,7 +350,52 @@ You have to use UART log to debug ESP8266 as mentioned above, such as `make moni
 
 # Build classic AT firmware for ESP8266
 
-Build AT firmware for D1 mini with 4M flash
+The latest classic AT firmware is v1.7.5 provided by ESP8266_NONOS_SDK. Since The most common devices that use ESP8266 is ESP-1 / ESP-1S module, I will introduce how to build and flash at firmware of ESP-1 / ESP-1S in the first section.
+
+## ESP-1 / ESP-1S
+
+There are various difference between ESP-1 and ESP-1S, the most important difference for us to build the firmware is ESP-1 has 512k flash and ESP-1S has 1MB flash. 
+
+### Check AT firmware version
+
+Since ESP-1/ESP-1S module has no UART chip integrated on baord, you have to use a external USB2TTL adapter and wire it up as:
+
+| USB2TTL | ESP-1S |
+|---------|--------|
+| 3v3     | 3v3    |
+| GND     | GND    |
+| TX      | RX     |
+| RX      | TX     |
+
+NOTE, **DO NOT use 5V power supply, ESP-1S is 3V3 tolerance.**
+
+And use tio as:
+```
+tio -b 115200 -m ONLCRNL /dev/ttyUSB0 
+```
+or picocom
+```
+picocom -b 115200 --omap crcrlf /dev/ttyUSB0
+```
+And input:
+```
+AT+GMR
+```
+The output look like :
+```
+AT version:1.7.5.0(Oct  9 2021 09:26:04)
+SDK version:3.0.5(b29dcd3)
+compile time:Mar 16 2023 13:20:21
+OK
+```
+
+Here I already updated to latest v1.7.5 version. if not, you can build and update the firmware by your self.
+
+### build AT firmware
+
+For ESP-1 and ESP-1S, since it has less than 1M flash, it can only support `at_nano` firmware which supports an SSL library with fewer ciphers but fits on  less then 1 MB of flash memory.
+
+To build at_nano
 ```
 make COMPILE=gcc BOOT=new APP=1 SPI_SPEED=80 SPI_MODE=DIO SPI_SIZE_MAP=6
 !!!
