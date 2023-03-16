@@ -446,6 +446,8 @@ Actually, it can be used to program to 2M or 4M flash size too.
 
 After firemware programmed, please refer to above "Check AT firmware version" section to verify it.
 
+I also put a copy at [esp-1s-at-firmware-v1.7.5](./esp-1s-at-firmware-v1.7.5) dir in this repo, you can use `flash-at_nano-to-esp-1s.sh` to program it to ESP-1S.
+
 ## Other 8266 devboards
 
 It's simpler to program at firmware for various ESP8266 devboards. Most of them have a UART chip integrated, it's not necessary to care about how to wire up, and most of them has 2M or 4M flash, `at` firmware can be used instead of `at_nano`.
@@ -497,7 +499,68 @@ OK
 ```
 
 
-# Build esp-at firmware for ESP8266
-[ESP-AT](https://github.com/espressif/esp-at) firmware for ESP8266 is newer than classic AT firmware, sometimes it also refer to `AT-MQTT` firmware. it is based on ESP8266_RTOS_SDK and the latest version is v2.2.1.0.
+# Build esp-at firmware for ESP-1S
 
+[ESP-AT](https://github.com/espressif/esp-at) firmware for ESP8266 is newer than classic AT firmware, sometimes it also refers to `AT-MQTT` firmware. it is based on ESP8266_RTOS_SDK and the latest version is v2.2.1.0.
 
+> v2.2.1.0_esp8266 is the last version of ESP-AT for ESP8266, corresponding to branch release/v2.2.0.0_esp8266, corresponding to documentation https://docs.espressif.com/projects/esp-at/en/release-v2.2.0.0_esp8266.
+
+<strike>
+  
+The building process should be:
+```
+git clone https://github.com/espressif/esp-at.git
+cd esp-at
+./build.py menuconfig
+```
+Then you will be prompted to config some options as:
+```
+Platform name:
+1. PLATFORM_ESP32
+2. PLATFORM_ESP8266
+3. PLATFORM_ESP32S2
+4. PLATFORM_ESP32C3
+choose(range[1,4]):2
+
+Module name:
+1. WROOM-02 (description: TX:15 RX:13)
+2. WROOM-5V2L (description: 5V UART level)
+3. ESP8266_1MB (description: No OTA)
+4. WROOM-02-N (description: TX:1 RX:3)
+5. WROOM-S2
+6. ESP8266_QCLOUD (description: QCLOUD TX:15 RX:13)
+choose(range[1,6]):3
+
+Enable silence mode to remove some logs and reduce the firmware size?
+0. No
+1. Yes
+choose(range[0,1]):0
+```
+
+After menu show up, go to `Component config -> Common ESP-related -> UART for console output` and choose `UART0 (TX1 RX3)`.
+
+Then built it as:
+```
+./build.py build
+```
+
+</strike>
+
+As I tried, the latest codes already broken and not work with ESP-1S.
+
+The latest workable firmware can be downloaded from https://github.com/espressif/esp-at/issues/606#issuecomment-1033569789. And it is built at Jul 11 2021.
+
+I also put a copy at [esp-1s-at-mqtt-firmware-v2.2](./esp-1s-at-mqtt-firmware-v2.2) dir in this repo, you can use `flash-at_mqtt-to-esp-1s.sh` to program it to ESP-1S.
+
+After programming finished, you can verify it by `tio -b 115200 /dev/ttyUSB0 -m ONLCRNL`:
+```
+$ tio -b 115200 /dev/ttyUSB0 -m ONLCRNL
+
+AT+GMR
+AT version:2.2.0.0(s-b097cdf - ESP8266 - Jun 17 2021 12:58:29)
+SDK version:v3.4-22-g967752e2
+compile time(6800286):Jul 11 2021 11:09:32
+Bin version:2.2.0(ESP8266_1MB)
+
+OK
+```
