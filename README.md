@@ -547,20 +547,29 @@ Then built it as:
 
 </strike>
 
-As I tried, the latest codes already broken and not work with ESP-1S.
+As I tried, I failed to build a workable firmware.
 
-The latest workable firmware can be downloaded from https://github.com/espressif/esp-at/issues/606#issuecomment-1033569789. And it is built at Jul 11 2021.
+The latest workable firmware can be downloaded from ai-thinker official website with below version information:
+```
+AT version:2.3.0.0-dev(s-bcd64d2 - ESP8266 - Jun 23 2021 11:42:05)
+SDK version:v3.4-22-g967752e2
+compile time(b498b58):Jun 30 2021 11:28:20
+Bin version:2.2.0(ESP8266_1MB)
+```
 
-I also put a copy at [esp-1s-at-mqtt-firmware-v2.2](./esp-1s-at-mqtt-firmware-v2.2) dir in this repo, you can use `flash-at_mqtt-to-esp-1s.sh` to program it to ESP-1S.
+I put a copy at [esp-1s-at-mqtt-firmware-v2.3dev](./esp-1s-at-mqtt-firmware-v2.3dev) dir in this repo, you can use `flash-at_mqtt-2.3dev-to-esp-1s.sh` to program it to ESP-1S.
 
 After programming finished, you can verify it by `tio -b 115200 /dev/ttyUSB0 -m ONLCRNL`:
 ```
 $ tio -b 115200 /dev/ttyUSB0 -m ONLCRNL
-
+```
+And input
+```
 AT+GMR
-AT version:2.2.0.0(s-b097cdf - ESP8266 - Jun 17 2021 12:58:29)
+
+AT version:2.3.0.0-dev(s-bcd64d2 - ESP8266 - Jun 23 2021 11:42:05)
 SDK version:v3.4-22-g967752e2
-compile time(6800286):Jul 11 2021 11:09:32
+compile time(b498b58):Jun 30 2021 11:28:20
 Bin version:2.2.0(ESP8266_1MB)
 
 OK
