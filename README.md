@@ -447,7 +447,7 @@ Actually, it can be used to program to 2M or 4M flash size too.
 
 After firemware programmed, please refer to above "Check AT firmware version" section to verify it.
 
-I also put a copy at [esp-1s-at-firmware-v1.7.5](./esp-1s-at-firmware-v1.7.5) dir in this repo, you can use `flash-at_nano-to-esp-1s.sh` to program it to ESP-1S.
+I also put a copy at [at-firmware-v1.7.5-esp8266-1m](./at-firmware-v1.7.5-esp8266-1m) dir in this repo, you can use `flash-at_nano-to-esp-1s.sh` to program it to ESP-1S.
 
 ## Other 8266 devboards
 
@@ -498,6 +498,8 @@ SDK version:3.0.5(b29dcd3)
 compile time:Mar 16 2023 13:14:07
 OK
 ```
+
+I also put a copy at [at-firmware-v1.7.5-esp8266-4m](./at-firmware-v1.7.5-esp8266-4m) dir in this repo, you can use `flash-at-to-esp8266-4m.sh` to program it to ESP8266 device with 4M flash.
 
 
 # AT-MQTT firmware for ESP-1S
@@ -557,7 +559,7 @@ compile time(b498b58):Jun 30 2021 11:28:20
 Bin version:2.2.0(ESP8266_1MB)
 ```
 
-I put a copy at [esp-1s-at-mqtt-firmware-v2.3dev](./esp-1s-at-mqtt-firmware-v2.3dev) dir in this repo, you can use `flash-at_mqtt-2.3dev-to-esp-1s.sh` to program it to ESP-1S.
+I put a copy at [at-mqtt-firmware-v2.3dev-esp8266-1m](./at-mqtt-firmware-v2.3dev-esp8266-1m) dir in this repo, you can use `flash-at_mqtt-2.3dev-to-esp-1s.sh` to program it to ESP-1S.
 
 After programming finished, you can verify it by `tio -b 115200 /dev/ttyUSB0 -m ONLCRNL`:
 ```
