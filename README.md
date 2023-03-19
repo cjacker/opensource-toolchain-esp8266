@@ -36,6 +36,7 @@ The ESP8266 is a low-cost Wi-Fi microchip, with built-in TCP/IP networking softw
 - [Debugging](#debugging)
 - [Classic AT firmware for ESP-1S](#classic-at-firmware-for-esp8266)
 - [AT-MQTT firmware for ESP-1S](#at-mqtt-firmware-for-esp-1s)
+ [AT simple usage](#at-simple-usage)
 
 # Hardware prerequiest
 - ESP8266 devboard
@@ -548,12 +549,12 @@ Then built it as:
 ```
 ./build.py build
 ```
-
 </strike>
 
-As I tried, I failed to build a workable firmware.
+As I tried, I failed to build a workable firmware for ESP8266 with 1M flash, I think the support of upstream may broken due to some unknown reason.
 
 The latest workable firmware can be downloaded from ai-thinker official website with below version information:
+
 ```
 AT version:2.3.0.0-dev(s-bcd64d2 - ESP8266 - Jun 23 2021 11:42:05)
 SDK version:v3.4-22-g967752e2
@@ -642,3 +643,24 @@ Bin version:2.2.1(WROOM-02-N)
 OK
 ```
 
+
+# AT simple usage
+Please refer to official documents for detail usage, here is just a brief intro to connect to WiFi:
+```
+# should return 'OK'
+AT
+# show firmware version information
+AT+GMR
+# current mode
+AT+CWMODE?
+# change to station mode
+AT+CWMODE=1
+# scan WiFi
+AT+CWLAP
+# connect
+AT+CWJAP="SSID","password"
+# show IP
+AT+CIPSTA?
+# ping
+AT+PING="A IP"
+```
