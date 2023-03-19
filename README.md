@@ -40,7 +40,7 @@ The ESP8266 is a low-cost Wi-Fi microchip, with built-in TCP/IP networking softw
 
 # Hardware prerequiest
 - ESP8266 devboard
-  + I use D1 mini (4M Flash) and An-Thinker ESP-1S in this tutorial
+  + I use D1 mini (4M flash) , NodeMCU V3 (4M flash) and An-Thinker ESP-1S (1M flash) in this tutorial
 
 # Toolchain overview
 - Compiler: Xtensa L106 GNU Toolchain
@@ -103,7 +103,7 @@ After build successfully, the 'hello_world.bin/elf` will be generated at `build`
 
 ## ESP8266_NONOS_SDK
 
-Non-OS SDK is not based on an operating system. And deprecated from December 2019, but there are still a lot of users stay with Non-OS SDK
+Non-OS SDK is not based on an operating system. And deprecated from December 2019, but there are still a lot of users stay with Non-OS SDK.
 
 ### Setup the SDK
 
