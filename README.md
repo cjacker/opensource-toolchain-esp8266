@@ -386,13 +386,13 @@ AT+GMR
 ```
 The output look like :
 ```
-AT version:1.7.5.0(Oct  9 2021 09:26:04)
-SDK version:3.0.5(b29dcd3)
-compile time:Mar 16 2023 13:20:21
+AT version:0.25.0.0(Jun  5 2015 16:27:16)
+SDK version:1.1.1
+Ai-Thinker Technology Co. Ltd.
+Jun 23 2015 23:23:50
+
 OK
 ```
-
-Here I already updated to latest v1.7.5 version. if not, you can build and update the firmware by your self.
 
 Because AT commands must be terminated with both the CR and LF ASCII control codes, I use `-m ONLCRNL` with tio or `--omap crcrlf` with picocom, otherwise, you have to use `Ctrl-M Ctrl-J` instead of `Enter` key.
 
