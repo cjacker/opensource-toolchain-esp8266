@@ -502,18 +502,20 @@ OK
 I also put a copy at [at-firmware-v1.7.5-esp8266-4m](./at-firmware-v1.7.5-esp8266-4m) dir in this repo, you can use `flash-at-to-esp8266-4m.sh` to program it to ESP8266 device with 4M flash.
 
 
-# AT-MQTT firmware for ESP-1S
+# AT-MQTT firmware for ESP8266
 
 [ESP-AT](https://github.com/espressif/esp-at) firmware for ESP8266 is newer than classic AT firmware, sometimes it also refers to `AT-MQTT` firmware. it is based on ESP8266_RTOS_SDK and the latest version is v2.2.1.0.
 
 > v2.2.1.0_esp8266 is the last version of ESP-AT for ESP8266, corresponding to branch release/v2.2.0.0_esp8266, corresponding to documentation https://docs.espressif.com/projects/esp-at/en/release-v2.2.0.0_esp8266.
 
+
+## ESP-1S
 <strike>
-  
 The building process should be:
 ```
 git clone https://github.com/espressif/esp-at.git
 cd esp-at
+git checkout release/v2.2.0.0_esp8266
 ./build.py menuconfig
 ```
 Then you will be prompted to config some options as:
@@ -576,3 +578,67 @@ Bin version:2.2.0(ESP8266_1MB)
 
 OK
 ```
+
+## Other ESP8266 devboards
+```
+git clone https://github.com/espressif/esp-at.git
+cd esp-at
+git checkout release/v2.2.0.0_esp8266
+./build.py menuconfig
+```
+Then you will be prompted to config some options:
+```
+Platform name:
+1. PLATFORM_ESP32
+2. PLATFORM_ESP8266
+3. PLATFORM_ESP32S2
+4. PLATFORM_ESP32C3
+choose(range[1,4]):2
+
+Module name:
+1. WROOM-02 (description: TX:15 RX:13)
+2. WROOM-5V2L (description: 5V UART level)
+3. ESP8266_1MB (description: No OTA)
+4. WROOM-02-N (description: TX:1 RX:3)
+5. WROOM-S2
+6. ESP8266_QCLOUD (description: QCLOUD TX:15 RX:13)
+choose(range[1,6]):4
+
+Enable silence mode to remove some logs and reduce the firmware size?
+0. No
+1. Yes
+choose(range[0,1]):0
+```
+
+After menu show up:
+- go to `Serial flash config`, choose `Flash size` according to your devboard.
+- go to `Component config -> Common ESP-related -> UART for console output` and choose `UART0 (TX1 RX3)`.
+
+Then built it as:
+```
+./build.py build
+```
+
+After built successfully, program the target device as:
+```
+./build.py flash
+```
+
+I put a copy at [at-mqtt-firmware-v2.2.2.0dev-esp8266-4m](./at-mqtt-firmware-v2.2.2.0dev-esp8266-4m) dir in this repo, you can use `flash.sh` to program it to ESP8266 with 4m flash.
+
+After programming finished, you can verify it by `tio -b 115200 /dev/ttyUSB0 -m ONLCRNL`:
+```
+$ tio -b 115200 /dev/ttyUSB0 -m ONLCRNL
+```
+And input
+```
+AT+GMR
+
+AT version:2.2.2.0-dev(952f658 - ESP8266 - Nov 23 2022 06:37:28)
+SDK version:v3.4-63-ge3348ac7
+compile time(64dbe87):Mar 19 2023 21:25:48
+Bin version:2.2.1(WROOM-02-N)
+
+OK
+```
+
