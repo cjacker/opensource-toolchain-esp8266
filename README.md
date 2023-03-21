@@ -511,14 +511,18 @@ I also put a copy at [at-firmware-v1.7.5-esp8266-4m](./at-firmware-v1.7.5-esp826
 
 
 ## ESP-1S
+
 <strike>
+
 The building process should be:
+
 ```
 git clone https://github.com/espressif/esp-at.git
 cd esp-at
 git checkout release/v2.2.0.0_esp8266
 ./build.py menuconfig
 ```
+
 Then you will be prompted to config some options as:
 ```
 Platform name:
@@ -549,6 +553,8 @@ Then built it as:
 ```
 ./build.py build
 ```
+
+
 </strike>
 
 As I tried, I failed to build a workable firmware for ESP8266 with 1M flash, I think the support of upstream may broken due to some unknown reason.
